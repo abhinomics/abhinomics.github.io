@@ -1,85 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Abhinomics | Personal Website</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-      color: #333;
-    }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-    section {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
-    }
-    h2 {
-      color: #2c3e50;
-    }
-    .project {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    footer {
-      background: #2c3e50;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      margin-top: 2rem;
-    }
-    a {
-      color: #2980b9;
-      text-decoration: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abhishek's Financial Planning Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a2a3a; /* Darker background */
+            background-image: linear-gradient(to bottom right, #1a2a3a, #2c3e50); /* Darker subtle gradient */
+            color: #e0f2f7; /* Default text color for body, though card will override */
+        }
+        .input-field {
+            border-radius: 0.75rem; /* More rounded corners */
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            transition: all 0.3s ease-in-out;
+            background-color: rgba(255, 255, 150, 0.15); /* Light yellow tint, semi-transparent */
+            color: #ffffff; /* White text for input values */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #facc15; /* Bright yellow */
+            box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.5); /* Matching glowing shadow */
+            transform: translateY(-2px);
+        }
+        .input-field::placeholder {
+            color: #cbd5e0; /* Lighter gray for placeholder */
+            opacity: 0.7; /* Slightly transparent */
+        }
+
+        .result-display {
+            background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white for results */
+            font-weight: bold;
+            color: #ffffff; /* White text for results */
+            border-radius: 0.75rem;
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card {
+            background-image: linear-gradient(to bottom right, #2c3e50, #4a69bd); /* Dark blue to medium blue gradient */
+            color: #ffffff; /* Default text color for elements inside card */
+            border-radius: 1.5rem; /* Even more rounded corners for the card */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(74, 105, 189, 0.7); /* Stronger, glowing shadow */
+            border: 1px solid #5a80e0; /* A matching border */
+        }
+        .card h1, .card h2, .card label {
+            color: #e0f2f7; /* Lighter text for headings and labels for better contrast */
+        }
+        .button-primary {
+            background-image: linear-gradient(to right, #8b5cf6, #6366f1); /* Vibrant purple-indigo gradient */
+            color: white;
+            padding: 0.9rem 1.8rem;
+            border-radius: 1rem; /* More rounded button */
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-image 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+        }
+        .button-primary:hover {
+            transform: translateY(-3px); /* Lift effect on hover */
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
+            background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Reverse gradient on hover */
+        }
+        .table-container {
+            -webkit-overflow-scrolling: touch;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.3rem;
+            text-align: right;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: #ffffff;
+        }
+        th {
+            background-color: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            text-align: right;
+        }
+        th:nth-child(1), td:nth-child(1) { width: 10%; }
+        th:nth-child(2), td:nth-child(2) { width: 25%; }
+        th:nth-child(3), td:nth-child(3) { width: 20%; }
+        th:nth-child(4), td:nth-child(4) { width: 25%; }
+        th:nth-child(5), td:nth-child(5) { width: 20%; }
+
+        @media (min-width: 768px) {
+            .grid-cols-1 {
+                grid-template-columns: 1fr;
+            }
+            .md\\:grid-cols-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .md\\:grid-cols-3 {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .max-w-4xl {
+                max-width: 80rem;
+            }
+        }
+        #aiInsightsDisplay {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem; /* Increased padding for better spacing */
+            margin-top: 1.5rem;
+            color: #e0f2f7;
+            font-size: 0.95rem;
+            line-height: 1.6; /* Increased line height for readability */
+            min-height: 80px;
+            display: flex;
+            flex-direction: column; /* Allow content to stack */
+            align-items: flex-start; /* Align text to the left */
+            justify-content: flex-start; /* Align content to the top */
+            text-align: left; /* Align text to the left */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap; /* Preserve whitespace and allow wrapping */
+        }
+        #aiInsightsDisplay.loading {
+            font-style: italic;
+            color: rgba(224, 242, 247, 0.7);
+            text-align: center; /* Keep loading text centered */
+            align-items: center; /* Center loading text */
+            justify-content: center; /* Center loading text */
+        }
+        #aiInsightsDisplay h3 {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #a78bfa; /* Highlight section titles */
+        }
+        #aiInsightsDisplay h3:first-child {
+            margin-top: 0; /* No top margin for the very first heading */
+        }
+        #aiInsightsDisplay p {
+            margin-bottom: 0.5rem;
+        }
+        #aiInsightsDisplay ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        #aiInsightsDisplay li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="card w-full max-w-4xl p-6 md:p-8">
+        <h1 class="text-3xl font-extrabold text-center mb-6">Abhishek's Financial Planning Calculator</h1>
 
-<header>
-  <h1>Abhishek Somani</h1>
-  <p>Finance Leader | Strategy | Digital Transformation</p>
-</header>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Input Section -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">Inputs (Editable Fields)</h2>
 
-<section>
-  <h2>About Me</h2>
-  <p>Hello! I'm Abhishek, a finance professional with a passion for business transformation and digital innovation. I currently serve as General Manager - ETO Plant Business Finance in Vadodara.</p>
-</section>
+                <div class="mb-4">
+                    <label for="currentMonthlyExpenses" class="block text-sm font-semibold mb-2">Current Monthly Expenses (₹):</label>
+                    <input type="number" id="currentMonthlyExpenses" value="80000" class="input-field w-full" placeholder="Enter current monthly expenses">
+                </div>
+                <div class="mb-4">
+                    <label for="cushionRate" class="block text-sm font-semibold mb-2">Cushion Rate (%):</label>
+                    <input type="number" id="cushionRate" value="25" class="input-field w-full" placeholder="Enter cushion rate">
+                </div>
+                <!-- New Monthly Expenses is now calculated, not input -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">New Monthly Expenses (₹):</label>
+                    <div id="newMonthlyExpensesDisplay" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label for="currentAge" class="block text-sm font-semibold mb-2">Current Age:</label>
+                    <input type="number" id="currentAge" value="35" class="input-field w-full" placeholder="Enter current age">
+                </div>
+                <div class="mb-4">
+                    <label for="retirementAge" class="block text-sm font-semibold mb-2">Retirement Age:</label>
+                    <input type="number" id="retirementAge" value="60" class="input-field w-full" placeholder="Enter retirement age">
+                </div>
+                <div class="mb-4">
+                    <label for="inflation" class="block text-sm font-semibold mb-2">Inflation (%):</label>
+                    <input type="number" id="inflation" value="6" class="input-field w-full" placeholder="Enter inflation rate">
+                </div>
+                <div class="mb-4">
+                    <label for="mortalityExpectation" class="block text-sm font-semibold mb-2">Mortality Expectation (Years):</label>
+                    <input type="number" id="mortalityExpectation" value="85" class="input-field w-full" placeholder="Enter mortality expectation">
+                </div>
+                <div class="mb-4">
+                    <label for="expectedReturnPreRetirement" class="block text-sm font-semibold mb-2">Expected Return Pre-Retirement (%):</label>
+                    <input type="number" id="expectedReturnPreRetirement" value="14" class="input-field w-full" placeholder="Enter pre-retirement return">
+                </div>
+                <div class="mb-6">
+                    <label for="expectedReturnPostRetirement" class="block text-sm font-semibold mb-2">Expected Return Post-Retirement (%):</label>
+                    <input type="number" id="expectedReturnPostRetirement" value="11" class="input-field w-full" placeholder="Enter post-retirement return">
+                </div>
+            </div>
 
-<section>
-  <h2>Projects</h2>
-  <div class="project">
-    <h3>Cost Optimization Dashboard</h3>
-    <p>Developed a Power BI dashboard to track and optimize plant costs, improving visibility and decision-making.</p>
-  </div>
-  <div class="project">
-    <h3>Digital Finance Transformation</h3>
-    <p>Led the implementation of automated reporting tools, reducing manual effort by 40%.</p>
-  </div>
-</section>
+            <!-- Calculated Results Section -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">Calculated Results</h2>
 
-<section>
-  <h2>Contact</h2>
-  <p>Email: <a href="mailto:your.email@example.com">your.email@example.com</a></p>
-  <p>LinkedIn: https://www.linkedin.com/in/yourprofile</p>
-  <p>Resume: <ttps://yourdomain.com/resume.pdf</p>
-</section>
+                <div class="mb-4">
+                    <label id="fv2045PerMonthLabel" class="block text-sm font-semibold mb-2">Future Value in [Retirement Year] (Per Month) (₹):</label>
+                    <div id="fv2045PerMonth" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label id="fv2045PerYearLabel" class="block text-sm font-semibold mb-2">Future Value in [Retirement Year] (Per Year) (₹):</label>
+                    <div id="fv2045PerYear" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Real Rate of Return (Fisher's Equation) (%):</label>
+                    <div id="realRateOfReturn" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Years to Retirement:</label>
+                    <div id="yearsToRetirement" class="result-display w-full">0</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Present Value of Annuity (Fisher's Formula) (₹):</label>
+                    <div id="pvAnnuityFisher" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Present Value of a growing annuity form (₹):</label>
+                    <div id="pvGrowingAnnuity" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Required Corpus (₹):</label>
+                    <div id="requiredCorpus" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">SIP w/o Lumpsum (₹):</label>
+                    <div id="sipWithoutLumpsum" class="result-display w-full">0.00</div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold mb-2">SIP w/ Lumpsum (₹):</label>
+                    <div id="sipWithLumpsum" class="result-display w-full">0.00</div>
+                </div>
+            </div>
+        </div>
 
-<footer>
-  <p>&copy; 2025 Abhishek Somani. All rights reserved.</p>
-</footer>
+        <!-- Tables Section -->
+        <h2 class="text-xl font-bold mt-8 mb-4 text-center">Detailed Projections</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="table-container">
+                <h3 class="text-lg font-semibold mb-2 text-center">Simple Solution</h3>
+                <table id="simpleSolutionTable">
+                    <thead>
+                        <tr>
+                            <th>Years</th>
+                            <th>Corpus</th>
+                            <th>Interest</th>
+                            <th>Withdrawal</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
+            <div class="table-container">
+                <h3 class="text-lg font-semibold mb-2 text-center">Growing Annuity Solution</h3>
+                <table id="complexSolutionTable">
+                    <thead>
+                        <tr>
+                            <th>Years</th>
+                            <th>Corpus</th>
+                            <th>Interest</th>
+                            <th>Withdrawal</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button id="calculateAllBtn" class="button-primary w-full mt-8">Calculate All</button>
+        <button id="getInsightsBtn" class="button-primary w-full mt-4">✨ Get Financial Insights ✨</button>
+        <div id="aiInsightsDisplay" class="mt-4">
+            Click "✨ Get Financial Insights ✨" to get AI-powered advice!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get references to all input elements
+            const currentMonthlyExpensesInput = document.getElementById('currentMonthlyExpenses');
+            const cushionRateInput = document.getElementById('cushionRate');
+            const currentAgeInput = document.getElementById('currentAge');
+            const retirementAgeInput = document.getElementById('retirementAge');
+            const inflationInput = document.getElementById('inflation');
+            const mortalityExpectationInput = document.getElementById('mortalityExpectation');
+            const expectedReturnPreRetirementInput = document.getElementById('expectedReturnPreRetirement');
+            const expectedReturnPostRetirementInput = document.getElementById('expectedReturnPostRetirement');
+
+            // Get references to all output elements
+            const newMonthlyExpensesDisplay = document.getElementById('newMonthlyExpensesDisplay');
+            const fv2045PerMonthDisplay = document.getElementById('fv2045PerMonth');
+            const fv2045PerYearDisplay = document.getElementById('fv2045PerYear');
+            const fv2045PerMonthLabel = document.getElementById('fv2045PerMonthLabel');
+            const fv2045PerYearLabel = document.getElementById('fv2045PerYearLabel');
+            const realRateOfReturnDisplay = document.getElementById('realRateOfReturn');
+            const yearsToRetirementDisplay = document.getElementById('yearsToRetirement');
+            const pvAnnuityFisherDisplay = document.getElementById('pvAnnuityFisher');
+            const pvGrowingAnnuityDisplay = document.getElementById('pvGrowingAnnuity');
+            const requiredCorpusDisplay = document.getElementById('requiredCorpus');
+            const sipWithoutLumpsumDisplay = document.getElementById('sipWithoutLumpsum');
+            const sipWithLumpsumDisplay = document.getElementById('sipWithLumpsum');
+
+            const simpleSolutionTableBody = document.querySelector('#simpleSolutionTable tbody');
+            const complexSolutionTableBody = document.querySelector('#complexSolutionTable tbody');
+            const calculateAllButton = document.getElementById('calculateAllBtn');
+            const getInsightsBtn = document.getElementById('getInsightsBtn');
+            const aiInsightsDisplay = document.getElementById('aiInsightsDisplay');
+
+            /**
+             * Formats a number to two decimal places and adds comma separators, with Rupee symbol.
+             * @param {number} num - The number to format.
+             * @returns {string} The formatted string.
+             */
+            function formatNumber(num) {
+                return num.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            /**
+             * Formats a number to a whole number (no decimals) and adds comma separators, with Rupee symbol.
+             * @param {number} num - The number to format.
+             * @returns {string} The formatted string.
+             */
+            function formatNumberNoDecimals(num) {
+                return Math.round(num).toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+
+            /**
+             * Calculates the Future Value of a present amount with inflation.
+             * FV = PV * (1 + inflation_rate)^years
+             * @param {number} pv - Present Value.
+             * @param {number} inflationRate - Annual inflation rate (as a decimal).
+             * @param {number} years - Number of years.
+             * @returns {number} Future Value.
+             */
+            function calculateFV(pv, inflationRate, years) {
+                return pv * Math.pow(1 + inflationRate, years);
+            }
+
+            /**
+             * Calculates the Present Value of an Ordinary Annuity.
+             * PV = P * [ (1 - (1 + r)^-n) / r ]
+             * Where:
+             * P = payment per period
+             * r = rate per period
+             * n = number of periods
+             * @param {number} payment - The payment per period.
+             * @param {number} rate - The rate per period (as a decimal).
+             * @param {number} periods - The number of periods.
+             * @returns {number} The Present Value of the ordinary annuity.
+             */
+            function calculatePVAnnuity(payment, rate, periods) {
+                if (rate === 0) {
+                    return payment * periods;
+                }
+                return payment * (1 - Math.pow(1 + rate, -periods)) / rate;
+            }
+
+            /**
+             * Calculates the Present Value of a Growing Annuity.
+             * PV = P * [ (1 - (1 + g)^n * (1 + r)^-n) / (r - g) ]
+             * Where:
+             * P = first payment
+             * r = discount rate (expected return post-retirement)
+             * g = growth rate (inflation)
+             * n = number of periods (mortality expectation - retirement age)
+             * @param {number} payment - The first payment (e.g., first year's expense in retirement).
+             * @param {number} rate - The discount rate per period (post-retirement return).
+             * @param {number} growth - The growth rate per period (inflation).
+             * @param {number} periods - The number of periods.
+             * @returns {number} The Present Value of the growing annuity.
+             */
+            function calculatePVGrowingAnnuity(payment, rate, growth, periods) {
+                if (rate === growth) {
+                    // Special case: rate equals growth rate
+                    return payment * periods * Math.pow(1 + rate, -1);
+                } else {
+                    return payment * (1 - Math.pow(1 + growth, periods) * Math.pow(1 + rate, -periods)) / (rate - growth);
+                }
+            }
+
+            /**
+             * Calculates the SIP (Systematic Investment Plan) amount.
+             * FV = P * (((1 + r)^n - 1) / r) * (1 + r)
+             * SIP = FV * r / (((1 + r)^n - 1) * (1 + r))
+             * @param {number} futureValue - The target future value (Required Corpus).
+             * @param {number} monthlyRate - Monthly rate of return (pre-retirement).
+             * @param {number} months - Total number of months (years to retirement * 12).
+             * @returns {number} The monthly SIP amount.
+             */
+            function calculateSIP(futureValue, monthlyRate, months) {
+                if (monthlyRate === 0) {
+                    return futureValue / months;
+                }
+                const factor = (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+                return futureValue / factor;
+            }
+
+
+            /**
+             * Performs all calculations and updates the UI.
+             */
+            function calculateAll() {
+                // Get input values, convert percentages to decimals
+                const currentMonthlyExpenses = parseFloat(currentMonthlyExpensesInput.value) || 0;
+                const cushionRate = (parseFloat(cushionRateInput.value) || 0) / 100;
+                const newMonthlyExpenses = currentMonthlyExpenses * (1 + cushionRate);
+                newMonthlyExpensesDisplay.textContent = formatNumber(newMonthlyExpenses);
+
+                const currentAge = parseFloat(currentAgeInput.value) || 0;
+                const retirementAge = parseFloat(retirementAgeInput.value) || 0;
+                const inflation = (parseFloat(inflationInput.value) || 0) / 100;
+                const mortalityExpectation = parseFloat(mortalityExpectationInput.value) || 0;
+                const expectedReturnPreRetirement = (parseFloat(expectedReturnPreRetirementInput.value) || 0) / 100;
+                const expectedReturnPostRetirement = (parseFloat(expectedReturnPostRetirementInput.value) || 0) / 100;
+
+                // --- Core Calculations ---
+                const yearsToRetirement = retirementAge - currentAge;
+                yearsToRetirementDisplay.textContent = yearsToRetirement.toFixed(0);
+
+                const currentYear = new Date().getFullYear();
+                const retirementYear = currentYear + yearsToRetirement;
+                fv2045PerMonthLabel.textContent = `Future Value in ${retirementYear} (Per Month) (₹):`;
+                fv2045PerYearLabel.textContent = `Future Value in ${retirementYear} (Per Year) (₹):`;
+
+
+                const fv2045PerMonth = calculateFV(newMonthlyExpenses, inflation, yearsToRetirement);
+                fv2045PerMonthDisplay.textContent = formatNumber(fv2045PerMonth);
+
+                const fv2045PerYear = fv2045PerMonth * 12;
+                fv2045PerYearDisplay.textContent = formatNumber(fv2045PerYear);
+
+                const realRateOfReturn = ((1 + expectedReturnPostRetirement) / (1 + inflation)) - 1;
+                realRateOfReturnDisplay.textContent = (realRateOfReturn * 100).toFixed(2);
+
+                const retirementYears = mortalityExpectation - retirementAge;
+                const pvAnnuityFisher = calculatePVAnnuity(fv2045PerYear, realRateOfReturn, retirementYears);
+                pvAnnuityFisherDisplay.textContent = formatNumber(pvAnnuityFisher);
+
+                const firstRetirementAnnualExpense = calculateFV(newMonthlyExpenses, inflation, yearsToRetirement) * 12;
+                const pvGrowingAnnuity = calculatePVGrowingAnnuity(firstRetirementAnnualExpense, expectedReturnPostRetirement, inflation, retirementYears);
+                pvGrowingAnnuityDisplay.textContent = formatNumber(pvGrowingAnnuity);
+
+                const requiredCorpus = pvGrowingAnnuity;
+                requiredCorpusDisplay.textContent = formatNumber(requiredCorpus);
+
+                const monthlyPreRetirementRate = expectedReturnPreRetirement / 12;
+                const totalMonthsPreRetirement = yearsToRetirement * 12;
+                const sipWithoutLumpsum = calculateSIP(requiredCorpus, monthlyPreRetirementRate, totalMonthsPreRetirement);
+                sipWithoutLumpsumDisplay.textContent = formatNumber(sipWithoutLumpsum);
+
+                const futureValueOfLumpsum = 0; // presentValue2045 input was removed
+                const remainingCorpusForSIP = Math.max(0, requiredCorpus - futureValueOfLumpsum);
+                const sipWithLumpsum = calculateSIP(remainingCorpusForSIP, monthlyPreRetirementRate, totalMonthsPreRetirement);
+                sipWithLumpsumDisplay.textContent = formatNumber(sipWithLumpsum);
+
+
+                // --- Table Calculations ---
+
+                // Simple Solution Table
+                simpleSolutionTableBody.innerHTML = ''; // Clear previous rows
+                let simpleCorpus = pvAnnuityFisher; // Start with the PV of Annuity (Fisher's Formula) for Simple Solution
+                const simpleSolutionWithdrawal = fv2045PerYear;
+
+                for (let year = 1; year <= retirementYears; year++) {
+                    const interest = simpleCorpus * realRateOfReturn;
+                    const withdrawal = simpleSolutionWithdrawal;
+                    const balance = simpleCorpus + interest - withdrawal;
+
+                    const row = simpleSolutionTableBody.insertRow();
+                    row.insertCell().textContent = year;
+                    row.insertCell().textContent = formatNumberNoDecimals(simpleCorpus);
+                    row.insertCell().textContent = formatNumberNoDecimals(interest);
+                    row.insertCell().textContent = formatNumberNoDecimals(withdrawal);
+                    row.insertCell().textContent = formatNumberNoDecimals(balance);
+                    simpleCorpus = balance; // Update corpus for next year
+                }
+
+                // Complex Solution with Growing Annuity Formula Table
+                complexSolutionTableBody.innerHTML = ''; // Clear previous rows
+                let complexCorpus = requiredCorpus; // Start with the Required Corpus
+                for (let year = 1; year <= retirementYears; year++) {
+                    const interest = complexCorpus * expectedReturnPostRetirement;
+                    const withdrawal = calculateFV(firstRetirementAnnualExpense, inflation, year - 1);
+                    const balance = complexCorpus + interest - withdrawal;
+
+                    const row = complexSolutionTableBody.insertRow();
+                    row.insertCell().textContent = year;
+                    row.insertCell().textContent = formatNumberNoDecimals(complexCorpus);
+                    row.insertCell().textContent = formatNumberNoDecimals(interest);
+                    row.insertCell().textContent = formatNumberNoDecimals(withdrawal);
+                    row.insertCell().textContent = formatNumberNoDecimals(balance);
+                    complexCorpus = balance; // Update corpus for next year
+                }
+            }
+
+            /**
+             * Fetches financial insights from the Gemini API.
+             */
+            async function getFinancialInsights() {
+                aiInsightsDisplay.textContent = "Generating insights... please wait.";
+                aiInsightsDisplay.classList.add('loading');
+                calculateAll(); // Ensure all calculations are up-to-date before sending data
+
+                // Collect data in a structured way for the prompt
+                const data = {
+                    currentMonthlyExpenses: parseFloat(currentMonthlyExpensesInput.value) || 0,
+                    cushionRate: (parseFloat(cushionRateInput.value) || 0) / 100,
+                    newMonthlyExpenses: parseFloat(newMonthlyExpensesDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    currentAge: parseFloat(currentAgeInput.value) || 0,
+                    retirementAge: parseFloat(retirementAgeInput.value) || 0,
+                    inflation: (parseFloat(inflationInput.value) || 0) / 100,
+                    mortalityExpectation: parseFloat(mortalityExpectationInput.value) || 0,
+                    expectedReturnPreRetirement: (parseFloat(expectedReturnPreRetirementInput.value) || 0) / 100,
+                    expectedReturnPostRetirement: (parseFloat(expectedReturnPostRetirementInput.value) || 0) / 100,
+                    fvRetirementYearPerMonth: parseFloat(fv2045PerMonthDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    fvRetirementYearPerYear: parseFloat(fv2045PerYearDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    realRateOfReturn: (parseFloat(realRateOfReturnDisplay.textContent.replace(/₹|,/g, '')) || 0) / 100,
+                    yearsToRetirement: parseFloat(yearsToRetirementDisplay.textContent) || 0,
+                    pvAnnuityFisher: parseFloat(pvAnnuityFisherDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    pvGrowingAnnuity: parseFloat(pvGrowingAnnuityDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    requiredCorpus: parseFloat(requiredCorpusDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    sipWithoutLumpsum: parseFloat(sipWithoutLumpsumDisplay.textContent.replace(/₹|,/g, '')) || 0,
+                    sipWithLumpsum: parseFloat(sipWithLumpsumDisplay.textContent.replace(/₹|,/g, '')) || 0
+                };
+
+                const prompt = `Based on the following financial planning data for a young adult in India, provide a structured financial insight report. All currency values are in Indian Rupees (₹).
+
+                **Section 1: Your Financial Snapshot**
+                Here's a breakdown of the core financial values from your calculator:
+                -   **Current Monthly Expenses:** You've set your current monthly expenses at ₹${data.currentMonthlyExpenses.toLocaleString('en-IN')}.
+                -   **Cushion Rate:** You've added a ${data.cushionRate * 100}% cushion, bringing your **New Monthly Expenses** to ₹${data.newMonthlyExpenses.toLocaleString('en-IN')}. This accounts for unexpected costs or lifestyle creep.
+                -   **Age & Retirement:** You are currently ${data.currentAge} years old and plan to retire at ${data.retirementAge} years, giving you **${data.yearsToRetirement} years to build your retirement corpus**.
+                -   **Life Expectancy:** Your **Mortality Expectation** is ${data.mortalityExpectation} years, meaning your retirement plan accounts for expenses up to this age.
+                -   **Expected Returns:** You anticipate a **Pre-Retirement Return** of ${data.expectedReturnPreRetirement * 100}% and a **Post-Retirement Return** of ${data.expectedReturnPostRetirement * 100}%.
+                -   **Future Expenses:** Your **Future Value at Retirement (Per Year)** is projected to be ₹${data.fvRetirementYearPerYear.toLocaleString('en-IN')}. This is your estimated annual expense in the first year of retirement, adjusted for inflation.
+                -   **Required Corpus:** To sustain your desired lifestyle through retirement, you'll need a **Required Corpus** of approximately ₹${data.requiredCorpus.toLocaleString('en-IN')}.
+                -   **Monthly SIP Needed:** To reach this corpus, you would need a **Monthly SIP (without any existing lumpsum)** of ₹${data.sipWithoutLumpsum.toLocaleString('en-IN')}.
+
+                **Section 2: Insights on Your Assumptions**
+                Let's consider the implications of the assumptions you've made:
+                -   **Inflation (${data.inflation * 100}%):** This is a critical factor. A ${data.inflation * 100}% inflation rate means your money's purchasing power will decrease significantly over time, and your future expenses will be much higher than today's. It's important to regularly review if this rate remains realistic.
+                -   **Expected Returns (Pre-Retirement ${data.expectedReturnPreRetirement * 100}%, Post-Retirement ${data.expectedReturnPostRetirement * 100}%):** The expected returns you've chosen are crucial. While ${data.expectedReturnPreRetirement * 100}% pre-retirement might be achievable with a well-diversified portfolio including equities, ${data.expectedReturnPostRetirement * 100}% post-retirement is a more conservative but potentially realistic assumption, especially if you plan to shift to less volatile assets. Ensure these align with your risk tolerance and investment choices.
+                -   **Mortality Expectation (${data.mortalityExpectation} years):** Planning until ${data.mortalityExpectation} years is a good baseline. However, increasing life expectancies mean there's a possibility you might live longer. Overestimating this can lead to over-saving, but underestimating it can lead to outliving your savings.
+                -   **Cushion Rate (${data.cushionRate * 100}%):** Including a ${data.cushionRate * 100}% cushion is a prudent step. It provides a buffer against unforeseen expenses or a desire for a slightly higher quality of life in retirement.
+
+                **Section 3: Actionable Advice**
+                Here's some actionable advice based on your current plan:
+                -   **Review and Adjust SIP:** The calculated monthly SIP of ₹${data.sipWithoutLumpsum.toLocaleString('en-IN')} is what's needed to achieve your target corpus. Regularly review your progress and adjust your SIP amount upwards if your income increases or if you find yourself falling behind. Even small, consistent increases can make a big difference over time.
+                -   **Monitor Inflation and Returns:** Keep a close eye on actual inflation rates and the performance of your investments. If inflation is consistently higher than your assumption, or your returns are lower, you may need to increase your SIP or adjust your retirement goals.
+                -   **Diversify Investments:** To achieve your expected returns, ensure your investment portfolio is well-diversified across different asset classes (e.g., equities, debt, gold) based on your risk profile.
+                -   **Consider Early Retirement Impact:** If you ever consider retiring earlier than ${data.retirementAge}, remember that it will significantly increase your required corpus and monthly SIP, as you'll have fewer years to save and more years in retirement.
+                -   **Professional Guidance:** For a personalized and comprehensive financial plan, consider consulting a certified financial advisor. They can help you fine-tune your assumptions, optimize your investment strategy, and navigate complex financial decisions.`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        let formattedText = text.replace(/\*\*(Section \d: .*?)\*\*/g, '<h3>$1</h3>');
+                        aiInsightsDisplay.innerHTML = formattedText;
+                    } else {
+                        // More specific error handling for API issues
+                        let errorMessage = "Could not generate insights. ";
+                        if (response.status === 401 || response.status === 403) {
+                            errorMessage += "API access denied. This feature works best within the collaborative environment where the API key is provided.";
+                        } else if (result.error && result.error.message) {
+                            errorMessage += `API Error: ${result.error.message}`;
+                        } else {
+                            errorMessage += "An unknown API error occurred. Please try again.";
+                        }
+                        aiInsightsDisplay.textContent = errorMessage;
+                        console.error("API Response Error:", result);
+                    }
+                } catch (error) {
+                    console.error("Error fetching AI insights:", error);
+                    aiInsightsDisplay.textContent = "An error occurred while fetching insights. Please check your network connection or try again later.";
+                } finally {
+                    aiInsightsDisplay.classList.remove('loading');
+                }
+            }
+
+            // Attach event listeners to all input fields for real-time calculation
+            const inputElements = document.querySelectorAll('.input-field');
+            inputElements.forEach(input => {
+                input.addEventListener('input', calculateAll);
+            });
+
+            // Attach event listener to the "Calculate All" button
+            calculateAllButton.addEventListener('click', calculateAll);
+
+            // Attach event listener to the new "Get Financial Insights" button
+            getInsightsBtn.addEventListener('click', getFinancialInsights);
+
+            // Initial calculation on page load
+            calculateAll();
+        });
+    </script>
 </body>
 </html>
