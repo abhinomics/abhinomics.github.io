@@ -138,7 +138,6 @@
             transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
             top: calc(100% + 0.25rem); /* Position closer below the input/display */
             left: 0;
-            /* Removed transform: translateY from default state */
             width: 100%; /* Take full width of parent input group */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: left; /* Ensure text aligns left within tooltip */
@@ -148,7 +147,6 @@
         .tooltip-content.show {
             opacity: 1;
             visibility: visible;
-            /* Removed transform: translateY from show state for immediate appearance */
         }
 
         /* Optional: Add a small arrow to the tooltip */
@@ -358,7 +356,8 @@
             const fv2045PerMonthDisplay = document.getElementById('fv2045PerMonth');
             const fv2045PerYearDisplay = document.getElementById('fv2045PerYear');
             const fv2045PerMonthLabel = document.getElementById('fv2045PerMonthLabel');
-            const fv2045PerYearLabel = document.getElementById('fv2045PerYearLabel'); // Fixed: changed to getElementById
+            // FIX: Corrected the problematic line where 'document' was reassigned
+            const fv2045PerYearLabel = document.getElementById('fv2045PerYearLabel');
             const realRateOfReturnDisplay = document.getElementById('realRateOfReturn');
             const yearsToRetirementDisplay = document.getElementById('yearsToRetirement');
             const pvAnnuityFisherDisplay = document.getElementById('pvAnnuityFisher');
@@ -569,8 +568,7 @@
                     const withdrawal = calculateFV(firstRetirementAnnualExpense, inflation, yearInRetirement - 1); // withdrawal inflates based on years in retirement
                     const balance = complexCorpus + interest - withdrawal;
 
-                    // Fixed: Changed complexSolutionTableBody.insertCell() to complexSolutionTableBody.insertRow()
-                    const row = complexSolutionTableBody.insertRow(); 
+                    const row = complexSolutionTableBody.insertRow();
                     row.insertCell().textContent = currentAgeInTable; // Display actual age
                     row.insertCell().textContent = formatNumberNoDecimals(complexCorpus);
                     row.insertCell().textContent = formatNumberNoDecimals(interest);
@@ -603,6 +601,12 @@
                         tooltipContent.classList.remove('show');
                     });
                 }
+            });
+
+            // Attach event listeners to all input fields for real-time calculation
+            const inputElements = document.querySelectorAll('.input-field');
+            inputElements.forEach(input => {
+                input.addEventListener('input', calculateAll);
             });
 
             // Initial calculation on page load
